@@ -1,3 +1,20 @@
+This repository is a mirror of http://bento4.sourceforge.net.
+It is dual license.  Please consult the original author for license information.
+You can find the license information in Documents/SDK/Bento4_SDK_documentation.pdf.
+Here is the quote:
+
+Bento4 is available under two different licenses.
+For applications that are entirely distributable under the terms of the GPL,
+the Bento4 GPL license applies.
+For applications that cannot be entirely distributable under the terms of the GPL
+(either the application, or code modules linked with the application are not 
+compatible with the terms of the GPL licence), a non-GPL commercial license is available
+from Axiomatic Systems LLC. Contact Gilles Boccon-Gibod (licensing@axiosys.com or bok@bok.net)
+for more information.
+
+
+Original Text Below:
+=====================================================================================
            Bento4 
            ------
            
