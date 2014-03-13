@@ -31,6 +31,7 @@
 +---------------------------------------------------------------------*/
 #include <stdio.h>
 #include <stdlib.h>
+#include <glog/logging.h>
 
 #include "Ap4.h"
 
@@ -395,7 +396,8 @@ main(int argc, char** argv)
     if (argc < 3) {
         PrintUsageAndExit();
     }
-    
+    google::InitGoogleLogging(argv[0]); 
+    LOG(INFO) << "Started.";
     // default options
     Options.segment                    = 0;
     Options.pmt_pid                    = 0x100;

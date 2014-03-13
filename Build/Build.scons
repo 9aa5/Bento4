@@ -102,7 +102,7 @@ def Executable(name,
         environment = env
     DeclareBuildDir(source_dir)
     sdk = ['Bento4'] + Split(extra_deps)
-    libs = GetLibraries(sdk) + environment['AP4_EXTRA_LIBS']
+    libs = GetLibraries(sdk) + environment['AP4_EXTRA_LIBS'] + ['glog', 'pthread']
     cpp_path = GetIncludeDirs(sdk) + extra_includes
     sources = GlobSources(source_dir, source_pattern)
     
@@ -122,6 +122,7 @@ def Executable(name,
         exe = environment.Program(target_name, 
                                   sources + environment['AP4_EXTRA_EXECUTABLE_OBJECTS'], 
                                   LIBS=libs, 
+                                  LIBPATH=['Thirdparty/lib'],
                                   CPPPATH=cpp_path)
     #environment.Alias(name, exe)
     
@@ -142,8 +143,10 @@ if os.path.exists(target_config_file):
 #######################################################
 # modules
 #######################################################
+source_dir_list = ['C++/'+dir for dir in ['Core', 'Crypto', 'MetaData', 'System/StdC', 'System/Posix', 'Codecs']]
+source_dir_list.append('../Thirdparty/out/include')
 LibraryModule(name               = 'Bento4', 
-              build_source_dirs  = ['C++/'+dir for dir in ['Core', 'Crypto', 'MetaData', 'System/StdC', 'System/Posix', 'Codecs']],
+              build_source_dirs  = source_dir_list, 
               included_modules   = 'Config')
            
 for name in ['Mp4Dump', 'Mp4Info', 'Mp4Edit', 'Mp4Encrypt', 'Mp4Decrypt', 'Mp4Tag', 'Mp4Extract', 'Mp4RtpHintInfo', 'Mp42Aac', 'Mp42Ts', 'Mp4DcfPackager', 'Mp4Fragment', 'Mp4Compact', 'Mp4Split', 'Mp4AudioClip']:       
@@ -155,5 +158,5 @@ Executable('AvcTrackWriterTest', source_dir='C++/Test/Avc')
 Executable('PassthroughWriterTest', source_dir='C++/Test/PassthroughWriter')
 Executable('TracksTest', source_dir='C++/Test/Tracks')
 Executable('BenchmarksTest', source_dir='C++/Test/Benchmarks')
-if 'AP4_BUILD_CONFIG_NO_SHARED_LIB' not in env:
-    Executable('libBento4C.so', source_dir='C++/CApi', shared_lib=True, lowercase=False)
+# if 'AP4_BUILD_CONFIG_NO_SHARED_LIB' not in env:
+#    Executable('libBento4C.so', source_dir='C++/CApi', shared_lib=True, lowercase=False)
