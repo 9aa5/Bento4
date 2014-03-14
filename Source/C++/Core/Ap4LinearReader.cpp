@@ -37,6 +37,7 @@
 #include "Ap4AtomFactory.h"
 #include "Ap4TfraAtom.h"
 
+#include <glog/logging.h>
 /*----------------------------------------------------------------------
 |   AP4_LinearReader::AP4_LinearReader
 +---------------------------------------------------------------------*/
@@ -343,6 +344,7 @@ AP4_LinearReader::AdvanceFragment()
     do {
         AP4_Atom* atom = NULL;
         result = AP4_DefaultAtomFactory::Instance.CreateAtomFromStream(*m_FragmentStream, atom);
+        LOG_IF(INFO, result == AP4_ERROR_EOS) << "CreateAtomFromStream EOS"; 
         if (AP4_SUCCEEDED(result)) {
             if (atom->GetType() == AP4_ATOM_TYPE_MOOF) {
                 AP4_ContainerAtom* moof = AP4_DYNAMIC_CAST(AP4_ContainerAtom, atom);

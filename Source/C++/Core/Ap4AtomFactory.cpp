@@ -99,6 +99,10 @@
 #include "Ap4PsshAtom.h"
 #include "Ap4Dec3Atom.h"
 
+#include <glog/logging.h>
+extern "C" {
+#include <signal.h>
+}
 /*----------------------------------------------------------------------
 |   AP4_AtomFactory::~AP4_AtomFactory
 +---------------------------------------------------------------------*/
@@ -158,7 +162,12 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
     atom = NULL;
 
     // check that there are enough bytes for at least a header
-    if (bytes_available < 8) return AP4_ERROR_EOS;
+    LOG_IF(INFO, bytes_available < 8) << "Less than 8 bytes available. (" <<bytes_available << ").";
+    if (bytes_available < 8) {
+        LOG(INFO) << "Less than 8 bytes available. (" <<bytes_available << ").";
+        raise(SIGINT);
+        return AP4_ERROR_EOS;
+    }
 
     // remember current stream offset
     AP4_Position start;
