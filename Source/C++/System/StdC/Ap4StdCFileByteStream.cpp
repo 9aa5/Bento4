@@ -35,12 +35,14 @@
 #include <stdio.h>
 #include <string.h>
 #if !defined(_WIN32_WCE)
+#include <signal.h>
 #include <errno.h>
 #include <sys/stat.h>
 #endif
 
 #include "Ap4FileByteStream.h"
 
+#include <glog/logging.h>
 /*----------------------------------------------------------------------
 |   compatibility wrappers
 +---------------------------------------------------------------------*/
@@ -170,7 +172,6 @@ AP4_StdcFileByteStream::Create(AP4_FileByteStream*      delegator,
         }
         
     }
-
     stream = new AP4_StdcFileByteStream(delegator, file, size);
     return AP4_SUCCESS;
 }
@@ -234,7 +235,12 @@ AP4_StdcFileByteStream::ReadPartial(void*     buffer,
     size_t nbRead;
 
     nbRead = fread(buffer, 1, bytesToRead, m_File);
+    long curPos = ftell(m_File);
 
+    LOG(INFO) << "To read " << bytesToRead << " bytes at " << curPos << ". " << nbRead << " bytes read.";
+    if (bytesToRead != nbRead) {
+        LOG(INFO) << "AP4_StdcFileByteStream::ReadPartial failed.";
+    }
     if (nbRead > 0) {
         bytesRead = (AP4_Size)nbRead;
         m_Position += nbRead;
@@ -281,6 +287,7 @@ AP4_StdcFileByteStream::Seek(AP4_Position position)
     if (position == m_Position) return AP4_SUCCESS;
     
     size_t result;
+    LOG(INFO) << "Seeking to " << position;
     result = AP4_fseek(m_File, position, SEEK_SET);
     if (result == 0) {
         m_Position = position;

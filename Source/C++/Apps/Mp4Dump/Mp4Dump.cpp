@@ -31,6 +31,7 @@
 +---------------------------------------------------------------------*/
 #include <stdio.h>
 #include <stdlib.h>
+#include <glog/logging.h>
 
 #include "Ap4.h"
 
@@ -227,7 +228,7 @@ main(int argc, char** argv)
     if (argc < 2) {
         PrintUsageAndExit();
     }
-
+    google::InitGoogleLogging(argv[0]); 
     // init the variables
     AP4_ByteStream*         input       = NULL;
     const char*             filename    = NULL;
