@@ -165,7 +165,7 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
     LOG_IF(INFO, bytes_available < 8) << "Less than 8 bytes available. (" <<bytes_available << ").";
     if (bytes_available < 8) {
         LOG(INFO) << "Less than 8 bytes available. (" <<bytes_available << ").";
-        raise(SIGINT);
+        // raise(SIGINT);
         return AP4_ERROR_EOS;
     }
 
