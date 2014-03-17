@@ -37,6 +37,7 @@
 #include "Ap4AtomFactory.h"
 #include "Ap4TfraAtom.h"
 
+#include <signal.h>
 #include <glog/logging.h>
 /*----------------------------------------------------------------------
 |   AP4_LinearReader::AP4_LinearReader
@@ -335,6 +336,13 @@ AP4_LinearReader::AdvanceFragment()
     AP4_Result result;
      
     // go the the start of the next fragment
+    AP4_LargeSize streamSize = 0;
+    m_FragmentStream->GetSize(streamSize);
+    LOG(INFO) << "Next Fragment Pos, stream size: (" << m_NextFragmentPosition << "," << streamSize << ");" ; 
+    if (m_NextFragmentPosition >= streamSize) {
+        LOG(INFO) << "End of stream detected. (" << m_NextFragmentPosition << "," << streamSize << ");" ; 
+    }
+
     result = m_FragmentStream->Seek(m_NextFragmentPosition);
     if (AP4_FAILED(result)) return result;
 

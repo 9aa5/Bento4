@@ -162,7 +162,6 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
     atom = NULL;
 
     // check that there are enough bytes for at least a header
-    LOG_IF(INFO, bytes_available < 8) << "Less than 8 bytes available. (" <<bytes_available << ").";
     if (bytes_available < 8) {
         LOG(INFO) << "Less than 8 bytes available. (" <<bytes_available << ").";
         // raise(SIGINT);

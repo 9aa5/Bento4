@@ -177,7 +177,7 @@ ReadSample(SampleReader&   reader,
     AP4_Result result = reader.ReadSample(sample, sample_data);
     if (AP4_FAILED(result)) {
         if (result == AP4_ERROR_EOS) {
-            LOG(INFO) << "ReadSample EOS.";
+            LOG(INFO) << "ReadSample EOS for track " << track.GetId() << ".";
             eos = true;
         } else {
             LOG(INFO) << "ReadSample encountred and error." << result;
