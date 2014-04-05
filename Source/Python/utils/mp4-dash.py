@@ -22,7 +22,7 @@ from mp4utils import *
 
 # setup main options
 VERSION = "1.4.0"
-SVN_REVISION = "$Revision: 541 $"
+SVN_REVISION = "$Revision: 542 $"
 SCRIPT_PATH = path.abspath(path.dirname(__file__))
 sys.path += [SCRIPT_PATH]
 
@@ -775,6 +775,8 @@ def main():
                 video_codec = video_desc['coding'] + '.%02x%02x%02x' % (video_desc['avc_profile'],
                                                                         video_desc['avc_profile_compat'],
                                                                         video_desc['avc_level'])
+            else:
+                video_codec = video_desc['coding']
         if video_codec is None:
             PrintErrorAndExit('ERROR: unable to determine the video codec for "' + str(video_track) + '"')
         video_track.codec = video_codec
