@@ -250,7 +250,10 @@ WriteSamples(AP4_Mpeg2TsWriter&               writer,
                 sync_sample = true;
             }
         }
-        if (chosen_track == NULL) break;
+        if (chosen_track == NULL) {
+            LOG(INFO) << "WriteSamples: No more chosen track, exit loop(1).";
+            break;
+        }
         
         // check if we need to start a new segment
         if (Options.segment && sync_sample) {
@@ -314,6 +317,7 @@ WriteSamples(AP4_Mpeg2TsWriter&               writer,
             if (AP4_FAILED(result)) return result;
             ++video_sample_count;
         } else {
+            LOG(INFO) << "WriteSamples: No more chosen track, exit loop(2).";
             break;
         }        
     }

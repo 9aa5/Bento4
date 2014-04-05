@@ -276,6 +276,7 @@ AP4_Result
 AP4_LinearReader::ProcessTrack(AP4_Track* track) 
 {
     // create a new entry for the track
+    LOG(INFO) << "Process track.";
     Tracker* tracker = new Tracker(track);
     tracker->m_SampleTable = track->GetSampleTable();
     return m_Trackers.Append(tracker);
@@ -291,6 +292,7 @@ AP4_LinearReader::ProcessMoof(AP4_ContainerAtom* moof,
 {
     AP4_Result result;
    
+    LOG(INFO) << "Process moof at " << moof_offset;
     // create a new fragment
     delete m_Fragment;
     m_Fragment = new AP4_MovieFragment(moof);
@@ -370,9 +372,9 @@ AP4_LinearReader::AdvanceFragment()
                     AP4_UI32 type;
                     m_FragmentStream->Tell(position);
                     result = m_FragmentStream->ReadUI32(size);
-                    if (AP4_FAILED(result)) return AP4_SUCCESS; // can't read more
+                    if (AP4_FAILED(result)) return result; // can't read more
                     result = m_FragmentStream->ReadUI32(type);
-                    if (AP4_FAILED(result)) return AP4_SUCCESS; // can't read more
+                    if (AP4_FAILED(result)) return result; // can't read more
                     if (size == 0) {
                         m_NextFragmentPosition = 0;
                     } else if (size == 1) {
@@ -412,22 +414,33 @@ AP4_LinearReader::Advance()
     for (;;) {
         for (unsigned int i=0; i<m_Trackers.ItemCount(); i++) {
             Tracker* tracker = m_Trackers[i];
-            if (tracker->m_Eos) continue;
-            if (tracker->m_SampleTable == NULL) continue;
+            if (tracker->m_Eos) {
+                LOG(INFO) << "AP4_LinearReader::Advance: tracker EOS skip.";
+                continue;
+            }
+            if (tracker->m_SampleTable == NULL) {
+                LOG(INFO) << "AP4_LinearReader::Advance: Empty sample table, skip.";
+                continue;
+            }
             
             // get the next sample unless we have it already
             if (tracker->m_NextSample == NULL) {
                 if (tracker->m_NextSampleIndex >= tracker->m_SampleTable->GetSampleCount()) {
-                    if (!m_HasFragments) tracker->m_Eos = true;
+                    if (!m_HasFragments) {
+                        LOG(INFO) << "Tracker EOS for Non-Fragmented.";
+                        tracker->m_Eos = true;
+                    }
                     if (tracker->m_SampleTableIsOwned) {
                         delete tracker->m_SampleTable;
                         tracker->m_SampleTable = NULL;
                     }
+                    LOG(INFO) << "AP4_LinearReader::Advance: all sample read, skip.";
                     continue;
                 }
                 tracker->m_NextSample = new AP4_Sample();
                 AP4_Result result = tracker->m_SampleTable->GetSample(tracker->m_NextSampleIndex, *tracker->m_NextSample);
                 if (AP4_FAILED(result)) {
+                    LOG(INFO) << "Tracker EOS";
                     tracker->m_Eos = true;
                     delete tracker->m_NextSample;
                     tracker->m_NextSample = NULL;
@@ -444,10 +457,19 @@ AP4_LinearReader::Advance()
             }
         }
         
-        if (next_tracker) break;
+        if (next_tracker) {
+            break;
+        }
         if (m_HasFragments) {
+            LOG(INFO) << "Advance fragment.";
             AP4_Result result = AdvanceFragment();
-            if (AP4_FAILED(result)) return result;
+            while (result == AP4_ERROR_EOS) {
+                sleep(2);
+                result = AdvanceFragment();
+            }
+            if (AP4_FAILED(result)) {
+                return result;
+            }
         } else {
             break;
         }
@@ -521,7 +543,9 @@ AP4_LinearReader::ReadNextSample(AP4_UI32        track_id,
     if (tracker == NULL) return AP4_ERROR_INVALID_PARAMETERS;
     for(;;) {
         // pop a sample if we can
-        if (PopSample(tracker, sample, sample_data)) return AP4_SUCCESS;
+        if (PopSample(tracker, sample, sample_data)) {
+           return AP4_SUCCESS;
+        }
 
         // don't continue if we've reached the end of that tracker
         if (tracker->m_Eos) return AP4_ERROR_EOS;
