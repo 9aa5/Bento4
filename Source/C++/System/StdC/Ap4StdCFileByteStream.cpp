@@ -319,6 +319,10 @@ AP4_StdcFileByteStream::Tell(AP4_Position& position)
 AP4_Result
 AP4_StdcFileByteStream::GetSize(AP4_LargeSize& size)
 {
+    if (AP4_fseek(m_File, 0, SEEK_END) >= 0) {
+        m_Size = AP4_ftell(m_File);
+        AP4_fseek(m_File, m_Position, SEEK_SET);
+    }
     size = m_Size;
     return AP4_SUCCESS;
 }
